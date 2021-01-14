@@ -82,3 +82,6 @@ def game_over():
     elif snake_head[1] < 0 or snake_head[1] > WINDOW_HEIGHT:
         print("GAME OVER")
     # Snake hits it's own body
+    for block in snake_body[1:]:
+        if block[0] == snake_head[0] and block[1] == snake_head[1]:
+            print("GAME OVER")
