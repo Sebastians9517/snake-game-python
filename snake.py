@@ -1,11 +1,41 @@
-import pygame
 from random import randrange
+import pygame
+
 
 # Game window
 
 WINDOW_WIDTH = 480
 WINDOW_HEIGHT = 640
 
+
+# Colors
+
+SNAKE_COLOR = (0, 255, 0)
+FOOD_COLOR = (255, 0, 0)
+BACKGROUND_COLOR = (0, 0, 0)
+FONT_COLOR = (255, 255, 255)
+
+
+# Difficulty settings
+DIFFICULTY = {
+    'easy': 10,
+    'medium': 25,
+    'hard': 40
+}
+
+game = pygame
+fps = pygame.time.Clock()
+window = None
+
+def init_game():
+    global game, window
+    game.init()
+    game.display.set_caption('Snake')
+    window = game.display.set_mode(size=(WINDOW_WIDTH, WINDOW_HEIGHT))
+    window.blit()
+
+def draw_stage():
+    window.fill(BACKGROUND_COLOR)
 
 # Snake
 
@@ -52,6 +82,10 @@ def snake_grown():
     snake_body.insert(0, snake_head)
     snake_move()
 
+def draw_snake():
+    global game, snake_body
+    for part in snake_body:
+        game.draw.rect(window, SNAKE_COLOR, game.Rect(part[0, part[1]], 10, 10)
 
 # Food
 
@@ -60,6 +94,11 @@ food = [200, 200]
 def food_respawn():
     global food
     food = [randrange((1, WINDOW_WIDTH // 10) * 10), randrange((1, WINDOW_HEIGHT // 10) * 10)]
+
+def draw_food():
+    global game, food
+    for part in snake_body:
+        game.draw.rect(window, FOOD_COLOR, game.Rect(food[0], food[1], 10, 10))
 
 
 # Score
@@ -70,6 +109,14 @@ def increase_score():
     global score
     score += 10
 
+def draw_score():
+    global game, score
+    SCORE_FONT = game.font.SysFont('Times New Roman', 20)
+    score_surface = SCORE_FONT.render('Score: {score}', True, FONT_COLOR)
+    score_rect = score_surface.get_rect()
+    score_rect.midtop = (WINDOW_WIDTH // 2, 15)
+    window.blit(score_surface, score_rect)
+
 
 # Game logic
 
@@ -78,10 +125,33 @@ def game_over():
     # Conditions:
     # Head hits the border of the screen
     if snake_head[0] < 0 or snake_head[0] > WINDOW_WIDTH:
-        print("GAME OVER")
+        draw_game_over()
     elif snake_head[1] < 0 or snake_head[1] > WINDOW_HEIGHT:
-        print("GAME OVER")
+        draw_game_over()
     # Snake hits it's own body
     for block in snake_body[1:]:
         if block[0] == snake_head[0] and block[1] == snake_head[1]:
-            print("GAME OVER")
+            draw_game_over()
+
+def draw_game_over():
+    global game, score
+    SCORE_FONT = game.font.SysFont('Times New Roman', 60)
+    score_surface = SCORE_FONT.render(f'GAME OVER', True, FOOD_COLOR)
+    window.fill(BACKGROUND_COLOR)
+    score_rect = score_surface.get_rect()
+    score_rect.midtop = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 30)
+    window.blit(score_surface, score_rect)
+
+
+def run():
+    global fps
+    init_game()
+    draw_snake()
+    draw_snake()
+    draw_food()
+    draw_score()
+    game.display.update()
+    fps.tick(DIFFICULTY['easy'])
+    sleep(5)
+
+run()
